@@ -1,10 +1,11 @@
 const mongoose=require("mongoose");
+const bcrypt=require("bcryptjs")
 const Employee=new mongoose.Schema({
-    FirstName :{
+    FirstName:{
      type:String,
      required:true
     },
-    LastName :{
+    LastName:{
         type:String,
         required:true
     },
@@ -27,11 +28,14 @@ const Employee=new mongoose.Schema({
     }
     ,Phone:{
         type:Number,
-
+        
     },
-    message:{
+    Message:{
      type:String,
     }
+})
+Employee.pre("save",async(next){
+    const passwordHash=await bcrypt.hash(Password,10);
 })
 const Register=new mongoose.model("Register",Employee);
 module.exports=Register;

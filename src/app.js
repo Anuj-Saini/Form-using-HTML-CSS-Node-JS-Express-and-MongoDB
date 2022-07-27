@@ -1,6 +1,8 @@
 const express=require("express");
 const path=require("path");
 const hbs=require("hbs");
+const bcrypt=require("bcryptjs")
+const jwt=require("jsonwebtoken");
 require("./db/conn");
 const app=express();
 const Register=require("../src/moduls/mb");
@@ -16,7 +18,13 @@ hbs.registerPartials(Partials_path);
 app.get("/",(req,res)=>{
     res.render("index");
 })
+app.post("/",(req,res)=>{
+    res.render("index");
+})
 app.get("/home",(req,res)=>{
+    res.render("index");
+})
+app.post("/home",(req,res)=>{
     res.render("index");
 })
 app.get("/register",(req,res)=>{
@@ -26,7 +34,7 @@ app.post("/register", async(req,res)=>{
     try {
        const password=req.body.Password;
        const cpassword=req.body.ConfirmPassword;
-       if(password===cpassword){
+       if(password.localeCompare(cpassword)){
          const newResister=new Register({
             FirstName:req.body.FirstName,
             LastName:req.body.LastName,
@@ -52,6 +60,25 @@ app.post("/register", async(req,res)=>{
 app.get("/login",(req,res)=>{
     res.render("login");
 })
+app.post("/login",async(req,res)=>{
+    const email=req.body.email;
+    const password=req.body.password;
+    const useremail= await Register.findOne({email:email});
+    const isMatch=await bcrypt.compare(password,useremail);
+    res.send(useremail.password);
+    if(isMatch){
+        res.status(201).send("index");
+    }else{
+        console.log("password is not matching");
+    }
+    console.log(useremail);
+})
+const createToken=async()=>{
+   const token =await jwt.sign({_id:"62daa7e98a8e41c3dd43f999"},"mynameisanujdonsainiclasshpppkrg");
+   
+    console.log(token)
+}
+createToken();
 app.listen(port,()=>{
     console.log(`server is running at ${port} sucessfully`);
 })
